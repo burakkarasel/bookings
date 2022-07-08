@@ -3,8 +3,8 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"github.com/burakkarasel/bookings/pkg/config"
-	"github.com/burakkarasel/bookings/pkg/models"
+	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/models"
 	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
@@ -86,7 +86,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 }
 
 // NewTemplates takes memory address of the app variable that declared in main package and makes it reachable in this
-// pockage
+// package
 func NewTemplates(a *config.AppConfig) {
 	app = a
 }

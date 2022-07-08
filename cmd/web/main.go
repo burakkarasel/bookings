@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
-	"github.com/burakkarasel/bookings/pkg/config"
-	"github.com/burakkarasel/bookings/pkg/handlers"
-	"github.com/burakkarasel/bookings/pkg/utils"
+	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/handlers"
+	"github.com/burakkarasel/bookings/internal/models"
+	"github.com/burakkarasel/bookings/internal/utils"
 	"log"
 	"net/http"
 	"time"
@@ -19,6 +21,9 @@ var session *scs.SessionManager
 
 func main() {
 	app.InProduction = false
+
+	// We used gob here to keep non-primitive types in our session
+	gob.Register(models.Reservation{})
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
