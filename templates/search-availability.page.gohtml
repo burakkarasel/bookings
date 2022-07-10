@@ -8,6 +8,7 @@
             <div class="col-md-6">
                 <h1 class="mt-5">Search for Availability</h1>
                 <form action="/search-availability" method="POST" novalidate class="needs-validation">
+                    <!-- This is the way i'm passing csrf token data to my form so i can make post requests -->
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
                     <div class="form-row">

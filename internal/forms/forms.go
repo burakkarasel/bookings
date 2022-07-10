@@ -22,14 +22,11 @@ func New(data url.Values) *Form {
 	}
 }
 
-// Has will be useful in future
+// Has checks if given value has a value in it or not (making a field required) it'll be useful with checkbox inputs
 func (f *Form) Has(field string, r *http.Request) bool {
 	x := r.Form.Get(field)
 
-	if x == "" {
-		return false
-	}
-	return true
+	return x != ""
 }
 
 // Valid returns true if there are no errors, otherwise false
@@ -40,6 +37,7 @@ func (f *Form) Valid() bool {
 // Required checks for required fields
 func (f *Form) Required(fields ...string) {
 	for _, field := range fields {
+		// we can use get function because we keep url values in our form struct
 		value := f.Get(field)
 		if strings.TrimSpace(value) == "" {
 			f.Errors.Add(field, "This field cannot be blank")
@@ -47,7 +45,7 @@ func (f *Form) Required(fields ...string) {
 	}
 }
 
-// MinLength checks for string minimum length
+// MinLength checks for string's minimum length
 func (f *Form) MinLength(field string, length int, r *http.Request) bool {
 	x := r.Form.Get(field)
 	if len(x) < length {
@@ -57,8 +55,9 @@ func (f *Form) MinLength(field string, length int, r *http.Request) bool {
 	return true
 }
 
-// IsEmail checks if given email is a valid email
+// IsEmail checks if given email is a valid email address
 func (f *Form) IsEmail(field string) {
+	// this gets the email field within url.Values and govalidator.IsEmail checks if this email's pattern is correct
 	if !govalidator.IsEmail(f.Get(field)) {
 		f.Errors.Add(field, "Invalid email address")
 	}

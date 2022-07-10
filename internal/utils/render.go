@@ -16,14 +16,19 @@ var functions = template.FuncMap{}
 
 var app *config.AppConfig
 
+// AddDefaultData holds data that we want to send to our templates
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	// Popstring puts a string into session until another page is displayed and it removes itself then
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
+	// we add CSRF token to our default data
 	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
+// RenderTemplate checks the template cache we created earlier with CreateTemplateCache and renders the specific
+// template that requested by user
 func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 

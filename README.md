@@ -6,3 +6,4 @@ This is my Repository for My Bookings & Reservations Project!
 - Uses [chi router](https://github.com/go-chi/chi)
 - Uses [alex edwards SCS](https://github.com/alexedwards/scs)
 - Uses [justinas nosurf](https://github.com/justinas/nosurf) 
+- Uses [asaskevich govalidator](https://github.com/asaskevich/govalidator)

@@ -14,12 +14,12 @@
                 </h1>
                 <p>
                     Your home away from home, set on the majestic waters of the
-                    Atlanctic Ocena, this will be a vacation to remember Your home away
-                    from home, set on the majestic waters of the Atlanctic Ocena, this
+                    Atlantic Ocean, this will be a vacation to remember Your home away
+                    from home, set on the majestic waters of the Atlantic Ocean, this
                     will be a vacation to remember Your home away from home, set on the
-                    majestic waters of the Atlanctic Ocena, this will be a vacation to
+                    majestic waters of the Atlantic Ocean, this will be a vacation to
                     remember Your home away from home, set on the majestic waters of the
-                    Atlanctic Ocena, this will be a vacation to remember
+                    Atlantic Ocean, this will be a vacation to remember
                 </p>
             </div>
         </div>
@@ -39,7 +39,7 @@
     <script>
         document.getElementById("check-availability-button").addEventListener("click", function () {
             const html = `
-              <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
+              <form id="check-availability-form" action="/search-availability-json" method="POST" novalidate class="needs-validation">
                 <div class="form-row">
                   <div class="col">
                     <div id="reservation-dates-modal" class="form-row d-flex">
@@ -80,8 +80,8 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data.ok)
-                            console.log(data.message)
+                            console.log(data.ok);
+                            console.log(data.message);
                         })
                 }
             });

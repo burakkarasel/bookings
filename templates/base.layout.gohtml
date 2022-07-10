@@ -148,6 +148,8 @@
             });
         }
 
+        // if anything passes to these they will notify the user
+
         {{with .Error}}
         notify("{{.}}", "error")
         {{end}}
