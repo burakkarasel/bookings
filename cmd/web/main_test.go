@@ -7,6 +7,6 @@ func TestRun(t *testing.T) {
 	err := run()
 
 	if err != nil {
-		t.Error("fauled run()")
+		t.Error("failed run()")
 	}
 }
