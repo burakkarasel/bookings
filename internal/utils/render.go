@@ -16,9 +16,11 @@ var functions = template.FuncMap{}
 
 var app *config.AppConfig
 
+var pathToTemplates = "./templates"
+
 // AddDefaultData holds data that we want to send to our templates
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
-	// Popstring puts a string into session until another page is displayed and it removes itself then
+	// PopString puts a string into session until another page is displayed, and it removes itself then
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
@@ -41,7 +43,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	t, ok := tc[tmpl]
 
 	if !ok {
-		log.Fatal("Couldnt get template from template cache")
+		log.Fatal("Couldn't get template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -61,7 +63,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./templates/*.page.gohtml")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.gohtml", pathToTemplates))
 
 	if err != nil {
 		return myCache, err
@@ -75,14 +77,14 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return myCache, err
 		}
 
-		matches, err := filepath.Glob("./templates/*.layout.gohtml")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplates))
 
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob("./templates/*.layout.gohtml")
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
