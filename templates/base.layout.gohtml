@@ -131,7 +131,12 @@
         })();
 
         // for datepicker
-
+        function notify(msg, msgType) {
+            notie.alert({
+                type: msgType,
+                text:msg,
+            })
+        }
 
 
         function notifyModal(title, html, icon, confirmButton) {
@@ -142,6 +147,18 @@
                 confirmButtonText: confirmButton,
             });
         }
+
+        {{with .Error}}
+        notify("{{.}}", "error")
+        {{end}}
+
+        {{with .Flash}}
+        notify("{{.}}", "success")
+        {{end}}
+
+        {{with .Warning}}
+        notify("{{.}}", "warning")
+        {{end}}
 
         // my module
         function Prompt() {
