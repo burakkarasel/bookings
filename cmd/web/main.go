@@ -20,6 +20,28 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+
+	err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("starting at port", port)
+
+	srv := &http.Server{
+		Addr:    port,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// run func includes most of the code we have in main func and we check anything that might return an error
+func run() error {
 	app.InProduction = false
 
 	// We used gob here to keep non-primitive types in our session
@@ -37,7 +59,7 @@ func main() {
 	tc, err := utils.CreateTemplateCache()
 
 	if err != nil {
-		log.Fatalln("cannot create template cache")
+		return err
 	}
 
 	app.TemplateCache = tc
@@ -50,16 +72,5 @@ func main() {
 
 	utils.NewTemplates(&app)
 
-	fmt.Println("starting at port", port)
-
-	srv := &http.Server{
-		Addr:    port,
-		Handler: routes(&app),
-	}
-
-	err = srv.ListenAndServe()
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	return nil
 }
