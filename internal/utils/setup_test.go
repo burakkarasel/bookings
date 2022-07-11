@@ -5,6 +5,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/models"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -24,6 +25,12 @@ func TestMain(m *testing.M) {
 
 	// We used gob here to keep non-primitive types in our session
 	gob.Register(models.Reservation{})
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	testApp.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	testApp.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour

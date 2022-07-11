@@ -6,10 +6,12 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/handlers"
+	"github.com/burakkarasel/bookings/internal/helpers"
 	"github.com/burakkarasel/bookings/internal/models"
 	"github.com/burakkarasel/bookings/internal/utils"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -18,6 +20,9 @@ const port = ":3000"
 var app config.AppConfig
 
 var session *scs.SessionManager
+
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func main() {
 
@@ -44,6 +49,12 @@ func main() {
 // we build run func because we dont want to test func main
 func run() error {
 	app.InProduction = false
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	// We used gob here to keep non-primitive types in our session
 	gob.Register(models.Reservation{})
@@ -72,6 +83,7 @@ func run() error {
 	handlers.NewHandlers(repo)
 
 	utils.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 
 	return nil
 }
