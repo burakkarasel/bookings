@@ -135,7 +135,7 @@ func (repo *Repository) PostMakeReservation(w http.ResponseWriter, r *http.Reque
 
 	// first checks if required are is filled or not then checks for length
 	form.Required("first_name", "last_name", "email")
-	form.MinLength("first_name", 3, r)
+	form.MinLength("first_name", 3)
 	form.IsEmail("email")
 
 	if !form.Valid() {

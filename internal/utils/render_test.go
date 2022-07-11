@@ -49,6 +49,8 @@ func TestRenderTemplate(t *testing.T) {
 
 	err = RenderTemplate(&ww, r, "home.page.gohtml", &models.TemplateData{})
 
+	app.UseCache = true
+
 	if err != nil {
 		t.Error("error writing template to browser")
 	}
@@ -57,7 +59,7 @@ func TestRenderTemplate(t *testing.T) {
 	err = RenderTemplate(&ww, r, "none-home.page.gohtml", &models.TemplateData{})
 
 	if err == nil {
-		t.Error("error writing template to browser")
+		t.Error("Rendered non-existing template")
 	}
 }
 
