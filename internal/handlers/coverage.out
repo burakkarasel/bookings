@@ -1,0 +1,22 @@
+mode: set
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:28.47,32.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:35.33,37.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:40.70,44.2 3 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:47.71,57.2 5 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:60.74,62.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:65.72,67.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:70.78,72.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:75.73,77.2 1 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:80.81,90.2 4 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:93.82,97.2 3 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:100.82,108.16 3 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:112.2,114.21 3 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:108.16,110.3 1 0
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:118.85,121.16 2 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:126.2,141.19 6 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:154.2,156.66 2 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:121.16,124.3 2 0
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:141.19,150.3 4 0
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:161.84,165.9 2 1
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:172.2,180.4 4 0
+github.com/burakkarasel/bookings/internal/handlers/handlers.go:165.9,169.3 3 1
