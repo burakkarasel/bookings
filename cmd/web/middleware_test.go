@@ -20,7 +20,7 @@ func TestNoSurf(t *testing.T) {
 	}
 }
 
-// TestSessionLoad is test func for SessionLoad func in routes.go. It checks return type of the func SessionLoad.
+// TestSessionLoad is test func for SessionLoad func in middleware.go. It checks return type of the func SessionLoad.
 func TestSessionLoad(t *testing.T) {
 	var myH myHandler
 

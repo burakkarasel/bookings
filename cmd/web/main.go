@@ -41,6 +41,7 @@ func main() {
 }
 
 // run func includes most of the code we have in main func and we check anything that might return an error
+// we build run func because we dont want to test func main
 func run() error {
 	app.InProduction = false
 

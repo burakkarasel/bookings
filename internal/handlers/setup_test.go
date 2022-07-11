@@ -19,11 +19,14 @@ import (
 
 var app config.AppConfig
 var session *scs.SessionManager
+
+// pathToTemplates we needed to make another path for templates because we will run test files in handlers directory
 var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
 // getRoutes function is a preparation for our handler's test file because we will need routes
 func getRoutes() http.Handler {
+	// main.go
 	app.InProduction = false
 
 	// We used gob here to keep non-primitive types in our session
@@ -54,11 +57,14 @@ func getRoutes() http.Handler {
 
 	utils.NewTemplates(&app)
 
+	// routes.go
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
 	// NoSurf adds CSRF protection to POST requests
 	//mux.Use(NoSurf)
+	// When we are testing our POST handlers with don't need to use CSRF protection that's we comment it out
+	// Because we test it out in middleware tests
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
@@ -81,6 +87,7 @@ func getRoutes() http.Handler {
 	return mux
 }
 
+// middleware.go
 // NoSurf adds CSRF protection to all POST requests
 func NoSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
@@ -99,7 +106,7 @@ func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
 
-// CreateTestTemplateCache creates template cache as a map
+// CreateTestTemplateCache creates template cache as a map for this package
 func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 

@@ -7,11 +7,13 @@ import (
 	"testing"
 )
 
+// postData holds our POST request params as a key-value pair
 type postData struct {
 	key   string
 	value string
 }
 
+// theTests holds our test cases
 var theTests = []struct {
 	name               string
 	url                string
@@ -103,6 +105,7 @@ var theTests = []struct {
 	},
 }
 
+// TestHandlers is our test func for handlers, it tests our handlers according to their request type
 func TestHandlers(t *testing.T) {
 	routes := getRoutes()
 	// we created a test server to run our tests
@@ -123,6 +126,7 @@ func TestHandlers(t *testing.T) {
 			}
 		} else {
 			values := url.Values{}
+			// we put our params into our empty url.Values
 			for _, v := range tt.params {
 				values.Add(v.key, v.value)
 			}
