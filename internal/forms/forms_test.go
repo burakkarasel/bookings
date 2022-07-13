@@ -61,7 +61,6 @@ func TestForm_IsEmail(t *testing.T) {
 	}
 
 	// expecting error
-	postedData = url.Values{}
 	postedData.Add("invalid", "asd")
 	form = New(postedData)
 
@@ -95,7 +94,6 @@ func TestForm_Has(t *testing.T) {
 		t.Error("didnt pass any key-value pair, but has returned true")
 	}
 
-	postedData = url.Values{}
 	postedData.Add("valid", "abc")
 	postedData.Add("invalid", "")
 
@@ -135,8 +133,7 @@ func TestForm_MinLength(t *testing.T) {
 	if isErr == "" {
 		t.Error("should have an error, but didnt get one")
 	}
-
-	postedData = url.Values{}
+	
 	postedData.Add("invalid", "a")
 	postedData.Add("valid", "abcde")
 	postedData.Add("another_valid", "abcdefghijk")
