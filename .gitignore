@@ -1,2 +1,8 @@
 .idea
 .vscode
+database.yml
+coverage.out
+bookings
+.DS_Store
+*.code-workspace
+run.sh
