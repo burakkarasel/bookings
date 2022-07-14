@@ -6,3 +6,4 @@ bookings
 .DS_Store
 *.code-workspace
 run.sh
+dsn.go

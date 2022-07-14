@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/driver"
 	"github.com/burakkarasel/bookings/internal/forms"
 	"github.com/burakkarasel/bookings/internal/helpers"
 	"github.com/burakkarasel/bookings/internal/models"
+	"github.com/burakkarasel/bookings/internal/repository"
+	"github.com/burakkarasel/bookings/internal/repository/dbrepo"
 	"github.com/burakkarasel/bookings/internal/utils"
 	"net/http"
 )
@@ -14,6 +17,7 @@ import (
 // Repository holds our app's configurations
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 var Repo *Repository
@@ -25,9 +29,10 @@ type jsonResponse struct {
 }
 
 // NewRepo lets us to create a new repository that keeps app's configurations in it
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 

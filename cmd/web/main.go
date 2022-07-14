@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/driver"
+	"github.com/burakkarasel/bookings/internal/dsn"
 	"github.com/burakkarasel/bookings/internal/handlers"
 	"github.com/burakkarasel/bookings/internal/helpers"
 	"github.com/burakkarasel/bookings/internal/models"
@@ -26,10 +28,13 @@ var errorLog *log.Logger
 
 func main() {
 
-	err := run()
+	db, err := run()
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer db.SQL.Close()
 
 	fmt.Println("starting at port", port)
 
@@ -47,7 +52,7 @@ func main() {
 
 // run func includes most of the code we have in main func and we check anything that might return an error
 // we build run func because we dont want to test func main
-func run() error {
+func run() (*driver.DB, error) {
 	app.InProduction = false
 
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -68,22 +73,31 @@ func run() error {
 
 	app.Session = session
 
+	// connect to DB
+	log.Println("Connecting to DB...")
+	db, err := driver.ConnectSQL(dsn.Dsn)
+
+	if err != nil {
+		log.Fatal("Cannot connect to DB:", err)
+	}
+
+	log.Println("Connected to DB!")
+
 	tc, err := utils.CreateTemplateCache()
 
 	if err != nil {
-		return err
+		return nil, err
 	}
-
 	app.TemplateCache = tc
 	// it gives us to access to developer mode so we can make changes on templates
 	// but as soon as we are done we should assign Usecache to false otherwise it will start reading from disc again
 	app.UseCache = true
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
 	utils.NewTemplates(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }
