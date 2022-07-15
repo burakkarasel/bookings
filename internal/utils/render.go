@@ -29,9 +29,9 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	return td
 }
 
-// RenderTemplate checks the template cache we created earlier with CreateTemplateCache and renders the specific
+// Template checks the template cache we created earlier with CreateTemplateCache and renders the specific
 // template that requested by user
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var tc map[string]*template.Template
 
 	if app.UseCache {
@@ -98,8 +98,8 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	return myCache, nil
 }
 
-// NewTemplates takes memory address of the app variable that declared in main package and makes it reachable in this
+// NewRenderer takes memory address of the app variable that declared in main package and makes it reachable in this
 // package
-func NewTemplates(a *config.AppConfig) {
+func NewRenderer(a *config.AppConfig) {
 	app = a
 }
