@@ -34,6 +34,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// we closed our DB here because when run function stops running our database was going to close itself
 	defer db.SQL.Close()
 
 	fmt.Println("starting at port", port)
@@ -50,8 +51,8 @@ func main() {
 	}
 }
 
-// run func includes most of the code we have in main func and we check anything that might return an error
-// we build run func because we dont want to test func main
+// run func includes most of the code we have in main func, and we check anything that might return an error
+// we build run func because we don't want to test func main
 func run() (*driver.DB, error) {
 	app.InProduction = false
 
@@ -63,12 +64,16 @@ func run() (*driver.DB, error) {
 
 	// We used gob here to keep non-primitive types in our session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(models.RoomRestriction{})
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
-	// we set secure to false because we are not using https right now our sessions are not gonna be encrypted
+	// we set secure to false because we are not using https right now our sessions are not going to be encrypted
 	session.Cookie.Secure = app.InProduction
 
 	app.Session = session
@@ -89,14 +94,14 @@ func run() (*driver.DB, error) {
 		return nil, err
 	}
 	app.TemplateCache = tc
-	// it gives us to access to developer mode so we can make changes on templates
-	// but as soon as we are done we should assign Usecache to false otherwise it will start reading from disc again
+	// it gives us to access to developer mode, so we can make changes on templates
+	// but as soon as we are done we should assign UseCache to false otherwise it will start reading from disc again
 	app.UseCache = true
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
-	utils.NewTemplates(&app)
+	utils.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
 	return db, nil
