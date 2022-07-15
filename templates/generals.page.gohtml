@@ -44,10 +44,10 @@
                   <div class="col">
                     <div id="reservation-dates-modal" class="form-row d-flex">
                       <div class="col me-2">
-                        <input disabled class="form-control" type="text" name="start" id="start" required placeholder="Arrival Date" autocomplete="off">
+                        <input disabled class="form-control" type="text" name="start_date" id="start_date" required placeholder="Arrival Date" autocomplete="off">
                       </div>
                       <div class="col">
-                        <input disabled class="form-control" type="text" name="end" id="end" required placeholder="Departure Date" autocomplete="off">
+                        <input disabled class="form-control" type="text" name="end_date" id="end_date" required placeholder="Departure Date" autocomplete="off">
                       </div>
                     </div>
                   </div>
@@ -62,17 +62,19 @@
                     const rp = new DateRangePicker(elem, {
                         format: "yyyy-mm-dd",
                         showOnFocus: true,
+                        minDate: new Date(),
                     });
                 },
                 didOpen: () => {
-                    document.getElementById("start").removeAttribute("disabled");
-                    document.getElementById("end").removeAttribute("disabled");
+                    document.getElementById("start_date").removeAttribute("disabled");
+                    document.getElementById("end_date").removeAttribute("disabled");
                 },
                 callback: function (result) {
 
                     const form = document.getElementById("check-availability-form");
                     const formData = new FormData(form);
-                    formData.append("csrf_token", "{{.CSRFToken}}")
+                    formData.append("csrf_token", "{{.CSRFToken}}");
+                    formData.append("room_id", "1");
 
                     fetch("/search-availability-json", {
                         method: "post",
@@ -80,8 +82,25 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data.ok);
-                            console.log(data.message);
+                            if (data.ok) {
+                                attention.custom({
+                                    icon: "success",
+                                    msg: '<p>Room is Available!</p>'
+                                        + '<p><a href="/book-room?id='
+                                        + data.room_id
+                                        +'&s='
+                                        + data.start_date
+                                        + '&e='
+                                        + data.end_date
+                                        + '" class="btn btn-primary">'
+                                        + 'Book Now!</a></p>',
+                                    showConfirmButton: false,
+                                })
+                            }else {
+                                attention.error({
+                                    msg: "No Availability",
+                                })
+                            }
                         })
                 }
             });

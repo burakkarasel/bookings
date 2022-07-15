@@ -49,6 +49,7 @@
         const elem = document.getElementById("reservation-date");
         const rangepicker = new DateRangePicker(elem, {
             format: "yyyy-mm-dd",
+            minDate: new Date(),
         });
 
         document.getElementById("check-availability-button").addEventListener("click", function () {
