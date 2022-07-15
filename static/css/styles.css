@@ -20,3 +20,7 @@
 .swal2-cancel {
   z-index: 5;
 }
+
+body {
+  overflow-x: hidden;
+}
