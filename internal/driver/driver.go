@@ -26,6 +26,7 @@ func ConnectSQL(dsn string) (*DB, error) {
 		panic(err)
 	}
 
+	// these will prevent loss of control on database
 	d.SetMaxOpenConns(maxOpenDbConn)
 	d.SetConnMaxIdleTime(maxIdleDbConn)
 	d.SetConnMaxLifetime(maxDbLifetime)
@@ -41,7 +42,7 @@ func ConnectSQL(dsn string) (*DB, error) {
 	return dbConn, nil
 }
 
-// testDB tries to ping DB
+// testDB tries to ping DB returns a potential error
 func testDB(d *sql.DB) error {
 	err := d.Ping()
 
@@ -52,7 +53,7 @@ func testDB(d *sql.DB) error {
 	return nil
 }
 
-// NewDataBase creates a new DB for application
+// NewDataBase creates a new DB for the application
 func NewDataBase(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 
@@ -60,7 +61,7 @@ func NewDataBase(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = testDB(db); err != nil {
 		return nil, err
 	}
 
