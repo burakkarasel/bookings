@@ -49,32 +49,56 @@ func NewHandlers(r *Repository) {
 
 // Home renders and displays the home page
 func (repo *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "home.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "home.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // About renders and displays the about page
 func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "about.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "about.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // Generals renders the room's page
 func (repo *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "generals.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "generals.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // Majors renders the room's page
 func (repo *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "majors.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "majors.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // Availability renders the search page for availability
 func (repo *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "search-availability.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "search-availability.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // Contact renders the contact page
 func (repo *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	utils.Template(w, r, "contact.page.gohtml", &models.TemplateData{})
+	err := utils.Template(w, r, "contact.page.gohtml", &models.TemplateData{})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // MakeReservation renders our reservation page
@@ -107,11 +131,15 @@ func (repo *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) 
 	data := make(map[string]interface{})
 	data["reservation"] = res
 
-	utils.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+	err = utils.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
 		Form:      forms.New(nil),
 		Data:      data,
 		StringMap: stringMap,
 	})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // PostAvailability sends our request
@@ -158,9 +186,13 @@ func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request)
 
 	repo.App.Session.Put(r.Context(), "reservation", res)
 
-	utils.Template(w, r, "choose-room.page.gohtml", &models.TemplateData{
+	err = utils.Template(w, r, "choose-room.page.gohtml", &models.TemplateData{
 		Data: data,
 	})
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // AvailabilityJSON handles request for availability and sends back JSON response
@@ -250,10 +282,14 @@ func (repo *Repository) PostMakeReservation(w http.ResponseWriter, r *http.Reque
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
-		utils.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+		err := utils.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
+
+		if err != nil {
+			helpers.ServerError(w, err)
+		}
 		return
 	}
 
@@ -316,10 +352,15 @@ func (repo *Repository) ReservationSummary(w http.ResponseWriter, r *http.Reques
 	stringMap := make(map[string]string)
 	stringMap["start_date"] = sd
 	stringMap["end_date"] = ed
-	utils.Template(w, r, "reservation-summary.page.gohtml", &models.TemplateData{
+	err := utils.Template(w, r, "reservation-summary.page.gohtml", &models.TemplateData{
 		Data:      data,
 		StringMap: stringMap,
 	})
+
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
 }
 
 // ChooseRoom displays available rooms for the given date
