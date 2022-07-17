@@ -117,7 +117,7 @@ func (repo *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) 
 								from 
 									room_restrictions rr
 								where 
-								$1 >= rr.start_date and $2 <= rr.end_date 
+								$1 <= rr.end_date and $2 >= rr.start_date 
 							)
 			`
 	rows, err := repo.DB.QueryContext(ctx, query, start, end)

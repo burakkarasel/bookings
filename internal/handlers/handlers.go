@@ -144,8 +144,8 @@ func (repo *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) 
 
 // PostAvailability sends our request
 func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
-	start := r.Form.Get("start")
-	end := r.Form.Get("end")
+	start := r.Form.Get("start_date")
+	end := r.Form.Get("end_date")
 
 	layout := "2006-01-02"
 
