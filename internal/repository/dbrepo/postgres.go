@@ -135,14 +135,14 @@ func (repo *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) 
 		roomSlc = append(roomSlc, room)
 	}
 
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		return roomSlc, err
 	}
 
 	return roomSlc, nil
 }
 
-// GetRoomById takes only one argument ID and returns the relevant room data
+// GetRoomById takes only one argument ID and returns the relevant room's data
 func (repo *postgresDBRepo) GetRoomById(id int) (models.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

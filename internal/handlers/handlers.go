@@ -278,13 +278,21 @@ func (repo *Repository) PostMakeReservation(w http.ResponseWriter, r *http.Reque
 	form.MinLength("first_name", 3)
 	form.IsEmail("email")
 
+	sd := reservation.StartDate.Format("2006-01-02")
+	ed := reservation.EndDate.Format("2006-01-02")
+
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
 		err := utils.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
-			Form: form,
-			Data: data,
+			Form:      form,
+			Data:      data,
+			StringMap: stringMap,
 		})
 
 		if err != nil {
@@ -363,18 +371,21 @@ func (repo *Repository) ReservationSummary(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// ChooseRoom displays available rooms for the given date
+// ChooseRoom is the handler of chosen room which caries the ID of the room in the URL after capturing the chosen roomID
+// from the URL, put it back in the session variable reservation, and redirect to /make-reservation route
 func (repo *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
 		helpers.ServerError(w, err)
+		return
 	}
 
 	res, ok := repo.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 
 	if !ok {
 		helpers.ServerError(w, err)
+		return
 	}
 
 	res.RoomID = roomID

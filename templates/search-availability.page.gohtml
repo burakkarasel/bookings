@@ -51,25 +51,5 @@
             format: "yyyy-mm-dd",
             minDate: new Date(),
         });
-
-        document.getElementById("check-availability-button").addEventListener("click", function () {
-            const html = `
-              <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
-                <div class="form-row">
-                  <div class="col">
-                    <div id="reservation-dates-modal" class="form-row d-flex">
-                      <div class="col me-2">
-                        <input disabled class="form-control" type="text" name="start" id="start_date" required placeholder="Arrival Date" autocomplete="off">
-                      </div>
-                      <div class="col">
-                        <input disabled class="form-control" type="text" name="end" id="end_date" required placeholder="Departure Date" autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            </form>
-              `;
-            attention.custom({ msg: html, title: "Choose your dates" });
-        });
     </script>
 {{end}}
