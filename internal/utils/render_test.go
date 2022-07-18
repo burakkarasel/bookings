@@ -28,7 +28,7 @@ func TestAddDefaultData(t *testing.T) {
 }
 
 // TestRenderTemplate tests our RenderTemplate func in render.go
-func TestRenderTemplate(t *testing.T) {
+func TestTemplate(t *testing.T) {
 	pathToTemplates = "./../../templates"
 	tc, err := CreateTemplateCache()
 
@@ -47,7 +47,7 @@ func TestRenderTemplate(t *testing.T) {
 	var ww myWriter
 	// Here I used my myWriter type, so I can test my RenderTemplate func now
 
-	err = RenderTemplate(&ww, r, "home.page.gohtml", &models.TemplateData{})
+	err = Template(&ww, r, "home.page.gohtml", &models.TemplateData{})
 
 	app.UseCache = true
 
@@ -56,7 +56,7 @@ func TestRenderTemplate(t *testing.T) {
 	}
 
 	// To check if it fails when it's suppose to
-	err = RenderTemplate(&ww, r, "none-home.page.gohtml", &models.TemplateData{})
+	err = Template(&ww, r, "none-home.page.gohtml", &models.TemplateData{})
 
 	if err == nil {
 		t.Error("Rendered non-existing template")
@@ -64,8 +64,8 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 // TestNewTemplates Tests our NewTemplates func in render.go
-func TestNewTemplates(t *testing.T) {
-	NewTemplates(app)
+func TestNewRenderer(t *testing.T) {
+	NewRenderer(app)
 }
 
 // TestCreateTemplateCache test our CreateTemplateCache func in render.go
