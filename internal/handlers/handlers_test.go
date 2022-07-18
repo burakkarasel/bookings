@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -162,12 +163,14 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	}
 
 	// put remaining missing parts to body of my request
-	reqBody := "first_name=John"
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Smith")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "email=john@here.com")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=555-555-5555")
 
-	req, _ := http.NewRequest("POST", "/post-make-reservation", strings.NewReader(reqBody))
+	postedData := url.Values{}
+	postedData.Add("first_name", "John")
+	postedData.Add("last_name", "Smith")
+	postedData.Add("email", "john@here.com")
+	postedData.Add("phone", "555-555-5555")
+
+	req, _ := http.NewRequest("POST", "/post-make-reservation", strings.NewReader(postedData.Encode()))
 	ctx := getCtx(req)
 	req = req.WithContext(ctx)
 	session.Put(ctx, "reservation", reservation)
@@ -214,12 +217,12 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	}
 	// failing form validation with invalid data
 
-	reqBody = "first_name=Jo"
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Smith")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "email=john@here.com")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=555-555-5555")
+	postedData.Set("first_name", "Jo")
+	postedData.Set("last_name", "Smith")
+	postedData.Set("email", "john@here.com")
+	postedData.Set("phone", "555-555-5555")
 
-	req, _ = http.NewRequest("POST", "/post-make-reservation", strings.NewReader(reqBody))
+	req, _ = http.NewRequest("POST", "/post-make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -233,13 +236,9 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	}
 
 	// failing insert data
-
-	reqBody = "first_name=John"
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Smith")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "email=john@here.com")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=555-555-5555")
-
-	req, _ = http.NewRequest("POST", "/post-make-reservation", strings.NewReader(reqBody))
+	postedData.Set("first_name", "John")
+	
+	req, _ = http.NewRequest("POST", "/post-make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -255,12 +254,7 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 
 	// failing insert room restriction
 
-	reqBody = "first_name=John"
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Smith")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "email=john@here.com")
-	reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=555-555-5555")
-
-	req, _ = http.NewRequest("POST", "post-make-reservation", strings.NewReader(reqBody))
+	req, _ = http.NewRequest("POST", "post-make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
