@@ -13,12 +13,6 @@ import (
 	"time"
 )
 
-// postData holds our POST request params as a key-value pair
-type postData struct {
-	key   string
-	value string
-}
-
 // theTests holds our test cases
 var theTests = []struct {
 	name               string
@@ -237,7 +231,7 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 
 	// failing insert data
 	postedData.Set("first_name", "John")
-	
+
 	req, _ = http.NewRequest("POST", "/post-make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
 	req = req.WithContext(ctx)
@@ -521,8 +515,8 @@ func TestRepository_BookRoom(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		url := fmt.Sprintf("/book-room?%s&%s&%s", test.RoomID, test.StartDate, test.EndDate)
-		req, _ := http.NewRequest("GET", url, nil)
+		requestURL := fmt.Sprintf("/book-room?%s&%s&%s", test.RoomID, test.StartDate, test.EndDate)
+		req, _ := http.NewRequest("GET", requestURL, nil)
 		ctx := getCtx(req)
 		req = req.WithContext(ctx)
 		session.Put(ctx, "reservation", models.Reservation{})
