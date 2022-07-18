@@ -56,38 +56,6 @@ var theTests = []struct {
 		method:             "GET",
 		expectedStatusCode: http.StatusOK,
 	},
-	//{
-	//	name:   "post search availability",
-	//	url:    "/search-availability",
-	//	method: "POST",
-	//	params: []postData{
-	//		{key: "start", value: "2020-01-01"},
-	//		{key: "end", value: "2020-01-02"},
-	//	},
-	//	expectedStatusCode: http.StatusOK,
-	//},
-	//{
-	//	name:   "post search availability json",
-	//	url:    "/search-availability-json",
-	//	method: "POST",
-	//	params: []postData{
-	//		{key: "start", value: "2020-01-01"},
-	//		{key: "end", value: "2020-01-02"},
-	//	},
-	//	expectedStatusCode: http.StatusOK,
-	//},
-	//{
-	//	name:   "post make reservation",
-	//	url:    "/make-reservation",
-	//	method: "POST",
-	//	params: []postData{
-	//		{key: "first_name", value: "John"},
-	//		{key: "last_name", value: "Smith"},
-	//		{key: "email", value: "john@smith.com"},
-	//		{key: "phone", value: "555-555-5555"},
-	//	},
-	//	expectedStatusCode: http.StatusOK,
-	//},
 }
 
 // TestGetHandlers is our test func for handlers, it tests our handlers according to their request type
