@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 )
 
@@ -25,8 +26,7 @@ var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
-// getRoutes function is a preparation for our handler's test file because we will need routes
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	// main.go
 	app.InProduction = false
 
@@ -55,15 +55,20 @@ func getRoutes() http.Handler {
 	}
 
 	app.TemplateCache = tc
-	// it gives us to access to developer mode so we can make changes on templates
-	// but as soon as we are done we should assign Usecache to false otherwise it will start reading from disc again
+	// it gives us to access to developer mode, so we can make changes on templates
+	// but as soon as we are done we should assign Use-cache to false otherwise it will start reading from disc again
 	app.UseCache = true
 
-	repo := NewRepo(&app)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 
 	utils.NewRenderer(&app)
 
+	os.Exit(m.Run())
+}
+
+// getRoutes function is a preparation for our handler's test file because we will need routes
+func getRoutes() http.Handler {
 	// routes.go
 	mux := chi.NewRouter()
 
