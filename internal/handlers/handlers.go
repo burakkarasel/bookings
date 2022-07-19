@@ -3,6 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/driver"
 	"github.com/burakkarasel/bookings/internal/forms"
@@ -11,10 +17,6 @@ import (
 	"github.com/burakkarasel/bookings/internal/repository"
 	"github.com/burakkarasel/bookings/internal/repository/dbrepo"
 	"github.com/burakkarasel/bookings/internal/utils"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // Repository holds our app's configurations
@@ -525,4 +527,65 @@ func (repo *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	repo.App.Session.Put(r.Context(), "reservation", res)
 
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+}
+
+// ShowLogin renders the login page
+func (repo *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	utils.Template(w, r, "login.page.gohtml", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+// PostShowLogin handles logging the user in
+func (repo *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
+	// after attempt to log in we renew our csrf token immediately for safety
+	_ = repo.App.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	form := forms.New(r.PostForm)
+
+	form.Required("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		utils.Template(w, r, "login.page.gohtml", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+
+	id, _, err := repo.DB.Authenticate(email, password)
+
+	if err != nil {
+		repo.App.Session.Put(r.Context(), "error", "Invalid login credentials")
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+
+	repo.App.Session.Put(r.Context(), "user_id", id)
+
+	repo.App.Session.Put(r.Context(), "flash", "Logged in successfully")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Logout logs a user out
+func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	_ = repo.App.Session.Destroy(r.Context())
+	_ = repo.App.Session.RenewToken(r.Context())
+
+	repo.App.Session.Put(r.Context(), "flash", "Succesfully logged out!")
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+// AdminDashboard renders the admin-dashboard template
+func (repo *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	utils.Template(w, r, "admin-dashboard.page.gohtml", &models.TemplateData{})
 }

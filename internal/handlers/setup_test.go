@@ -3,13 +3,6 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/alexedwards/scs/v2"
-	"github.com/burakkarasel/bookings/internal/config"
-	"github.com/burakkarasel/bookings/internal/models"
-	"github.com/burakkarasel/bookings/internal/utils"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -17,6 +10,14 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/alexedwards/scs/v2"
+	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/models"
+	"github.com/burakkarasel/bookings/internal/utils"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/justinas/nosurf"
 )
 
 var app config.AppConfig
