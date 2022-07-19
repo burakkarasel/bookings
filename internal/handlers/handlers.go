@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/driver"
 	"github.com/burakkarasel/bookings/internal/forms"
@@ -356,6 +357,46 @@ func (repo *Repository) PostMakeReservation(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
+	// send notifications - first to guest
+	htmlGuestMessage := fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong>
+    	<br>
+    	Dear %s, 
+		<br>
+    	This is confirmation for your reservation from %s to %s to in %s
+	`, reservation.FirstName+" "+reservation.LastName, reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"), reservation.Room.RoomName)
+
+	guestMSG := models.MailData{
+		To:       reservation.Email,
+		From:     "me@here.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlGuestMessage,
+		Template: "basic.gohtml",
+	}
+
+	repo.App.MailChan <- guestMSG
+
+	htmlOwnerMessage := fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong>
+    	<br>
+    	Dear Owner, 
+		<br>
+    	This is confirmation for reservation of your %s from %s to %s.
+		You can reach the guest via this email : %s.
+	`, reservation.Room.RoomName, reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"), reservation.Email)
+
+	ownerMessage := models.MailData{
+		To:       "owner@here.com",
+		From:     "me@here.com",
+		Subject:  "New Reservation",
+		Content:  htmlOwnerMessage,
+		Template: "basic.gohtml",
+	}
+
+	repo.App.MailChan <- ownerMessage
 
 	// we put the value we receive from form into our session as last version of the reservation,
 	//so we can display it when we redirect to reservation summary route
