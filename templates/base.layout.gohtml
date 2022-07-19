@@ -36,15 +36,15 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
+                    <li class="nav-item" tabindex="-1" aria-disabled="true">
                         <a class="nav-link active" aria-current="page" href="/"
                         >Home</a
                         >
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/about">About</a>
+                        <a class="nav-link" href="/about" tabindex="-1" aria-disabled="true">About</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown" tabindex="-1" aria-disabled="true">
                         <a
                                 class="nav-link dropdown-toggle"
                                 href="#"
@@ -55,22 +55,30 @@
                         >
                             Rooms
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" tabindex="-1" aria-disabled="true">
                             <li>
-                                <a class="dropdown-item" href="/generals-quarters"
+                                <a class="dropdown-item" href="/generals-quarters" tabindex="-1" aria-disabled="true"
                                 >General's Quarters</a
                                 >
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/majors-suite">Major's Suite</a>
+                                <a class="dropdown-item" href="/majors-suite" tabindex="-1" aria-disabled="true">Major's Suite</a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/contact">Contact</a>
+                        <a class="nav-link" href="/contact" tabindex="-1" aria-disabled="true">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/search-availability">Book Now</a>
+                        <a class="nav-link" href="/search-availability" tabindex="-1" aria-disabled="true">Book Now</a>
+                    </li>
+                    <li class="nav-item">
+                    {{if eq .IsAuthenticated 1}}
+                        <a class="nav-link" href="/user/logout" tabindex="-1" aria-disabled="true">Logout</a>
+                    {{else}}
+                        <a class="nav-link" href="/user/login" tabindex="-1" aria-disabled="true">Login</a>
+                    {{end}}
+                        
                     </li>
                 </ul>
             </div>
