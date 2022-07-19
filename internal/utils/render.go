@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/burakkarasel/bookings/internal/config"
-	"github.com/burakkarasel/bookings/internal/models"
-	"github.com/justinas/nosurf"
 	"html/template"
 	"net/http"
 	"path/filepath"
+
+	"github.com/burakkarasel/bookings/internal/config"
+	"github.com/burakkarasel/bookings/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 var functions = template.FuncMap{}
@@ -24,6 +25,9 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
+	if app.Session.Exists(r.Context(), "user_id") {
+		td.IsAuthenticated = 1
+	}
 	// we add CSRF token to our default data
 	td.CSRFToken = nosurf.Token(r)
 	return td
