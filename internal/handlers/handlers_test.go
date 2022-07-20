@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"github.com/burakkarasel/bookings/internal/models"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/burakkarasel/bookings/internal/models"
 )
 
 // theTests holds our test cases
@@ -53,7 +54,7 @@ var theTests = []struct {
 	},
 }
 
-// TestGetHandlers is our test func for handlers, it tests our handlers according to their request type
+// TestGetHandlers is our test func for handlers, it tests only our render handlers
 func TestGetHandlers(t *testing.T) {
 	routes := getRoutes()
 	// we created a test server to run our tests
@@ -61,17 +62,15 @@ func TestGetHandlers(t *testing.T) {
 	defer ts.Close()
 
 	for _, tt := range theTests {
-		if tt.method == "GET" {
-			resp, err := ts.Client().Get(ts.URL + tt.url)
+		resp, err := ts.Client().Get(ts.URL + tt.url)
 
-			if err != nil {
-				t.Log(err)
-				t.Fatal(err)
-			}
+		if err != nil {
+			t.Log(err)
+			t.Fatal(err)
+		}
 
-			if resp.StatusCode != tt.expectedStatusCode {
-				t.Errorf("for %s expected %d, got %d", tt.name, tt.expectedStatusCode, resp.StatusCode)
-			}
+		if resp.StatusCode != tt.expectedStatusCode {
+			t.Errorf("for %s expected %d, got %d", tt.name, tt.expectedStatusCode, resp.StatusCode)
 		}
 	}
 }
@@ -310,9 +309,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		reqBody := test.StartDate
-		reqBody = fmt.Sprintf("%s&%s", reqBody, test.EndDate)
-		reqBody = fmt.Sprintf("%s&%s", reqBody, test.RoomID)
+		reqBody := fmt.Sprintf("%s&%s&%s", test.StartDate, test.EndDate, test.RoomID)
 
 		req, _ := http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
 		ctx := getCtx(req)
@@ -364,8 +361,7 @@ func TestRepository_PostAvailability(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		reqBody := test.StartDate
-		reqBody = fmt.Sprintf("%s&%s", reqBody, test.EndDate)
+		reqBody := fmt.Sprintf("%s&%s", test.StartDate, test.EndDate)
 
 		req, _ := http.NewRequest("POST", "/search-availability", strings.NewReader(reqBody))
 		ctx := getCtx(req)
