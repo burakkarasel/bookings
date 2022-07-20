@@ -214,7 +214,19 @@ func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request)
 
 // AvailabilityJSON handles request for availability and sends back JSON response
 func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	err := r.ParseForm()
+
+	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "error during parsing form",
+		}
+
+		res, _ := json.Marshal(resp)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(res)
+		return
+	}
 
 	sd := r.Form.Get("start_date")
 	ed := r.Form.Get("end_date")
@@ -224,6 +236,15 @@ func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request)
 	startDate, err := time.Parse(layout, sd)
 
 	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "error during parsing start date",
+		}
+
+		res, _ := json.Marshal(resp)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(res)
+
 		repo.App.Session.Put(r.Context(), "error", "invalid start date")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
@@ -232,6 +253,15 @@ func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request)
 	endDate, err := time.Parse(layout, ed)
 
 	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "error during parsing end date",
+		}
+
+		res, _ := json.Marshal(resp)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(res)
+
 		repo.App.Session.Put(r.Context(), "error", "invalid end date")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
@@ -240,6 +270,15 @@ func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request)
 	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
 
 	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "error during parsing room_id",
+		}
+
+		res, _ := json.Marshal(resp)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(res)
+
 		repo.App.Session.Put(r.Context(), "error", "invalid room id")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
@@ -248,6 +287,15 @@ func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request)
 	available, err := repo.DB.SearchAvailabilityByDatesByRoomID(startDate, endDate, roomID)
 
 	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "error cannot reach database",
+		}
+
+		res, _ := json.Marshal(resp)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(res)
+
 		repo.App.Session.Put(r.Context(), "error", "invalid room id")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return

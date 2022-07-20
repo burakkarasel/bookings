@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -266,45 +267,62 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 func TestRepository_AvailabilityJSON(t *testing.T) {
 
 	tests := []struct {
-		TestName           string
-		StartDate          string
-		EndDate            string
-		RoomID             string
-		ExpectedStatusCode int
+		TestName     string
+		StartDate    string
+		EndDate      string
+		RoomID       string
+		ExpectedJson jsonResponse
 	}{
 		{
-			TestName:           "Success",
-			StartDate:          "start_date=2050-01-01",
-			EndDate:            "end_date=2050-01-02",
-			RoomID:             "room_id=1",
-			ExpectedStatusCode: http.StatusOK,
+			TestName:  "Success",
+			StartDate: "start_date=2050-01-01",
+			EndDate:   "end_date=2050-01-02",
+			RoomID:    "room_id=1",
+			ExpectedJson: jsonResponse{
+				OK:        true,
+				StartDate: "2050-01-01",
+				EndDate:   "2050-01-02",
+				RoomID:    "1",
+			},
 		}, {
-			TestName:           "Invalid Start Date",
-			StartDate:          "start_date=invalid",
-			EndDate:            "end_date=2050-01-02",
-			RoomID:             "room_id=1",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			TestName:  "Invalid Start Date",
+			StartDate: "start_date=invalid",
+			EndDate:   "end_date=2050-01-02",
+			RoomID:    "room_id=1",
+			ExpectedJson: jsonResponse{
+				OK:      false,
+				Message: "error during parsing start date",
+			},
 		},
 		{
-			TestName:           "Invalid End Date",
-			StartDate:          "start_date=2050-01-01",
-			EndDate:            "end_date=invalid",
-			RoomID:             "room_id=1",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			TestName:  "Invalid End Date",
+			StartDate: "start_date=2050-01-01",
+			EndDate:   "end_date=invalid",
+			RoomID:    "room_id=1",
+			ExpectedJson: jsonResponse{
+				OK:      false,
+				Message: "error during parsing end date",
+			},
 		},
 		{
-			TestName:           "Invalid Room ID",
-			StartDate:          "start_date=2050-01-01",
-			EndDate:            "end_date=2050-01-02",
-			RoomID:             "room_id=invalid",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			TestName:  "Invalid Room ID",
+			StartDate: "start_date=2050-01-01",
+			EndDate:   "end_date=2050-01-02",
+			RoomID:    "room_id=invalid",
+			ExpectedJson: jsonResponse{
+				OK:      false,
+				Message: "error during parsing room_id",
+			},
 		},
 		{
-			TestName:           "DB fail",
-			StartDate:          "start_date=2050-01-01",
-			EndDate:            "end_date=2050-01-02",
-			RoomID:             "room_id=17",
-			ExpectedStatusCode: http.StatusSeeOther,
+			TestName:  "DB fail",
+			StartDate: "start_date=2050-01-01",
+			EndDate:   "end_date=2050-01-02",
+			RoomID:    "room_id=17",
+			ExpectedJson: jsonResponse{
+				OK:      false,
+				Message: "error cannot reach database",
+			},
 		},
 	}
 
@@ -320,8 +338,15 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 		handler := http.HandlerFunc(Repo.AvailabilityJSON)
 		handler.ServeHTTP(rr, req)
 
-		if rr.Code != test.ExpectedStatusCode {
-			t.Errorf("AvailabilityJSON handler returned wrong status code: got %d, wanted %d", rr.Code, test.ExpectedStatusCode)
+		var j jsonResponse
+		err := json.Unmarshal([]byte(rr.Body.Bytes()), &j)
+
+		if err != nil {
+			t.Error("failed to parse json")
+		}
+
+		if j != test.ExpectedJson {
+			t.Errorf("AvailabilityJSON handler returned wrong response: got %v, wanted %v", j, test.ExpectedJson)
 		}
 	}
 }
