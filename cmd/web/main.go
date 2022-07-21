@@ -3,6 +3,11 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/alexedwards/scs/v2"
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/driver"
@@ -11,10 +16,6 @@ import (
 	"github.com/burakkarasel/bookings/internal/helpers"
 	"github.com/burakkarasel/bookings/internal/models"
 	"github.com/burakkarasel/bookings/internal/utils"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
 const port = ":3000"
@@ -59,7 +60,7 @@ func main() {
 // run func includes most of the code we have in main func, and we check anything that might return an error
 // we build run func because we don't want to test func main
 func run() (*driver.DB, error) {
-	app.InProduction = false
+	app.InProduction = true
 
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
@@ -103,8 +104,8 @@ func run() (*driver.DB, error) {
 	}
 	app.TemplateCache = tc
 	// it gives us to access to developer mode, so we can make changes on templates
-	// but as soon as we are done we should assign UseCache to false otherwise it will start reading from disc again
-	app.UseCache = true
+	// but as soon as we are done we should assign UseCache to true otherwise it will start reading from disc again
+	app.UseCache = false
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
