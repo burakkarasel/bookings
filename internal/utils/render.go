@@ -7,13 +7,16 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/models"
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
 
 var app *config.AppConfig
 
@@ -106,4 +109,9 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 // package
 func NewRenderer(a *config.AppConfig) {
 	app = a
+}
+
+// HumanDate is available for our templates, it makes dates much more readable YYYY-MM-DD
+func HumanDate(t time.Time) string {
+	return t.Format("2006-01-02")
 }
