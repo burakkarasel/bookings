@@ -72,3 +72,31 @@ func (repo *testDBRepo) UpdateUser(u models.User) error {
 func (repo *testDBRepo) Authenticate(email, testPassword string) (int, string, error) {
 	return 0, "", nil
 }
+
+func (repo *testDBRepo) AllReservations() ([]models.Reservation, error) {
+	var reservations []models.Reservation
+	return reservations, nil
+}
+
+func (repo *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
+	var reservations []models.Reservation
+	return reservations, nil
+}
+
+func (repo *testDBRepo) GetReservationById(id int) (models.Reservation, error) {
+	var reservation models.Reservation
+	return reservation, nil
+}
+
+func (repo *testDBRepo) UpdateReservation(r models.Reservation) error {
+	return nil
+}
+
+func (repo *testDBRepo) DeleteReservation(id int) error {
+	return nil
+}
+
+func (repo *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
+
+	return nil
+}

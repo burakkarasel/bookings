@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"github.com/burakkarasel/bookings/internal/models"
 	"time"
+
+	"github.com/burakkarasel/bookings/internal/models"
 )
 
 type DatabaseRepo interface {
@@ -15,4 +16,10 @@ type DatabaseRepo interface {
 	GetUserById(id int) (models.User, error)
 	UpdateUser(u models.User) error
 	Authenticate(email, testPassword string) (int, string, error)
+	AllReservations() ([]models.Reservation, error)
+	AllNewReservations() ([]models.Reservation, error)
+	GetReservationById(id int) (models.Reservation, error)
+	UpdateReservation(r models.Reservation) error
+	DeleteReservation(id int) error
+	UpdateProcessedForReservation(id, processed int) error
 }
