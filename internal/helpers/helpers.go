@@ -2,9 +2,10 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/burakkarasel/bookings/internal/config"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/burakkarasel/bookings/internal/config"
 )
 
 var app *config.AppConfig
@@ -27,7 +28,7 @@ func ServerError(w http.ResponseWriter, err error) {
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-// IsAuthenticated returns if a user logged in or not by checking the session
+// IsAuthenticated returns if a user logged in or not by checking the session for user_id variable
 func IsAuthenticated(r *http.Request) bool {
 	exists := app.Session.Exists(r.Context(), "user_id")
 	return exists

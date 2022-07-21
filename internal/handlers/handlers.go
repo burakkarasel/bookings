@@ -586,7 +586,7 @@ func (repo *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
 
 // PostShowLogin handles logging the user in
 func (repo *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
-	// after attempt to log in we renew our csrf token immediately for safety
+	// after attempt to log in we renew our csrf token immediately for safety from session fixation attacks
 	_ = repo.App.Session.RenewToken(r.Context())
 
 	err := r.ParseForm()
@@ -628,7 +628,7 @@ func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	_ = repo.App.Session.Destroy(r.Context())
 	_ = repo.App.Session.RenewToken(r.Context())
 
-	repo.App.Session.Put(r.Context(), "flash", "Succesfully logged out!")
+	repo.App.Session.Put(r.Context(), "warning", "Succesfully logged out!")
 
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }

@@ -2,8 +2,9 @@ package dbrepo
 
 import (
 	"errors"
-	"github.com/burakkarasel/bookings/internal/models"
 	"time"
+
+	"github.com/burakkarasel/bookings/internal/models"
 )
 
 // for now i only need this functions to exist, so I can make my unit test with other packages
@@ -57,14 +58,17 @@ func (repo *testDBRepo) GetRoomById(id int) (models.Room, error) {
 	return room, nil
 }
 
+// GetUserById gets user from DB by id
 func (repo *testDBRepo) GetUserById(id int) (models.User, error) {
 	return models.User{}, nil
 }
 
+// UpdateUser updates a user
 func (repo *testDBRepo) UpdateUser(u models.User) error {
 	return nil
 }
 
+// Authenticate authenticates a user
 func (repo *testDBRepo) Authenticate(email, testPassword string) (int, string, error) {
 	return 0, "", nil
 }

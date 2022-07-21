@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/burakkarasel/bookings/internal/models"
-	mail "github.com/xhit/go-simple-mail/v2"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/burakkarasel/bookings/internal/models"
+	mail "github.com/xhit/go-simple-mail/v2"
 )
 
+// listenForMail runs asynchronously while our program runs, if mail channel receives a mail it sends it
 func listenForMail() {
 	go func() {
 		for {
@@ -18,6 +20,8 @@ func listenForMail() {
 	}()
 }
 
+// sendMsg creates a server, and connects the client to this server then uses a mail template, and fill it with the information
+// that received from reservation, and recevives the details of the mail from mail channel
 func sendMsg(m models.MailData) {
 	server := mail.NewSMTPClient()
 	server.Host = "localhost"
@@ -52,7 +56,5 @@ func sendMsg(m models.MailData) {
 
 	if err != nil {
 		errorLog.Println(err)
-	} else {
-		infoLog.Println("email sent")
 	}
 }
