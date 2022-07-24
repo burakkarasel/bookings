@@ -100,3 +100,26 @@ func (repo *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
 
 	return nil
 }
+
+// AllRooms return the rooms from the DB
+func (repo *testDBRepo) AllRooms() ([]models.Room, error) {
+	var rooms []models.Room
+	return rooms, nil
+}
+
+// GetRestrictionForRoomByDate returns if a room for given date is available or not
+func (repo *testDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+
+	var restrictions []models.RoomRestriction
+	return restrictions, nil
+}
+
+// InsertBlockForRoom inserts a new block for a given room in DB
+func (repo *testDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	return nil
+}
+
+// RemoveBlockForRoom removes the block for given room restriction
+func (repo *testDBRepo) RemoveBlockForRoom(id int) error {
+	return nil
+}

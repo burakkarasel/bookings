@@ -292,7 +292,7 @@ func (repo *postgresDBRepo) AllReservations() ([]models.Reservation, error) {
 	return reservations, nil
 }
 
-// AllReservations returns all of the reservations from DB as a slice
+// AllNewReservations returns all of the new reservations from DB as a slice
 func (repo *postgresDBRepo) AllNewReservations() ([]models.Reservation, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -437,6 +437,137 @@ func (repo *postgresDBRepo) UpdateProcessedForReservation(id, processed int) err
 	`
 
 	_, err := repo.DB.ExecContext(ctx, query, processed, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AllRooms return the rooms from the DB
+func (repo *postgresDBRepo) AllRooms() ([]models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var rooms []models.Room
+
+	query := `select id, room_name, created_at, updated_at from rooms order by room_name`
+
+	rows, err := repo.DB.QueryContext(ctx, query)
+
+	if err != nil {
+		return rooms, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var room models.Room
+
+		err := rows.Scan(
+			&room.ID,
+			&room.RoomName,
+			&room.CreatedAt,
+			&room.UpdatedAt,
+		)
+
+		if err != nil {
+			return rooms, err
+		}
+
+		rooms = append(rooms, room)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+
+	return rooms, nil
+}
+
+// GetRestrictionForRoomByDate returns if a room for given date is available or not
+func (repo *postgresDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	// here we used coalesce for null reservation ids if reservation id is null it returns 0
+	query := `
+		select id, coalesce(reservation_id, 0), restriction_id, room_id, start_date, end_date
+		from room_restrictions
+		where $1 < end_date and $2 >= start_date and room_id = $3
+	`
+
+	rows, err := repo.DB.QueryContext(ctx, query, start, end, roomID)
+
+	if err != nil {
+		return restrictions, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var r models.RoomRestriction
+
+		err := rows.Scan(
+			&r.ID,
+			&r.ReservationID,
+			&r.RestrictionID,
+			&r.RoomID,
+			&r.StartDate,
+			&r.EndDate,
+		)
+
+		if err != nil {
+			return restrictions, err
+		}
+
+		restrictions = append(restrictions, r)
+	}
+
+	if err = rows.Err(); err != nil {
+		return restrictions, err
+	}
+
+	return restrictions, nil
+}
+
+// InsertBlockForRoom inserts a new block for a given room in DB
+func (repo *postgresDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		insert into room_restrictions (start_date, end_date, room_id, restriction_id, created_at, updated_at)
+		values($1, $2, $3, $4, $5, $6)
+	`
+
+	_, err := repo.DB.ExecContext(ctx, query,
+		startDate,
+		startDate.AddDate(0, 0, 1),
+		id,
+		2,
+		time.Now(),
+		time.Now(),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RemoveBlockForRoom removes the block for given room restriction
+func (repo *postgresDBRepo) RemoveBlockForRoom(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from room_restrictions where id = $1`
+
+	_, err := repo.DB.ExecContext(ctx, query, id)
 
 	if err != nil {
 		return err
