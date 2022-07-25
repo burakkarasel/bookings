@@ -25,7 +25,12 @@ var session *scs.SessionManager
 
 // pathToTemplates we needed to make another path for templates because we will run test files in handlers directory
 var pathToTemplates = "./../../templates"
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate":  utils.HumanDate,
+	"formatDate": utils.FormatDate,
+	"iterate":    utils.Iterate,
+	"add":        utils.Add,
+}
 
 func TestMain(m *testing.M) {
 	// main.go
@@ -33,6 +38,11 @@ func TestMain(m *testing.M) {
 
 	// We used gob here to keep non-primitive types in our session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(models.RoomRestriction{})
+	gob.Register(map[string]int{})
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
@@ -100,8 +110,29 @@ func getRoutes() http.Handler {
 	mux.Post("/make-reservation", Repo.PostMakeReservation)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
 
+	mux.Get("/choose-room/{id}", Repo.ChooseRoom)
+
+	mux.Get("/book-room", Repo.BookRoom)
+
+	mux.Get("/user/login", Repo.ShowLogin)
+	mux.Post("/user/login", Repo.PostShowLogin)
+	mux.Get("/user/logout", Repo.Logout)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	mux.Get("/admin/dashboard", Repo.AdminDashboard)
+
+	mux.Get("/admin/reservations-new", Repo.AdminNewReservations)
+	mux.Get("/admin/reservations-all", Repo.AdminAllReservations)
+	mux.Get("/admin/reservations-calendar", Repo.AdminReservationsCalendar)
+	mux.Post("/admin/reservations-calendar", Repo.AdminPostReservationsCalendar)
+
+	mux.Get("/admin/process-reservations/{src}/{id}/do", Repo.AdminProcessedReservation)
+	mux.Get("/admin/delete-reservations/{src}/{id}/do", Repo.AdminDeleteReservation)
+
+	mux.Get("/admin/reservations/{src}/{id}/show", Repo.AdminShowReservationDetail)
+	mux.Post("/admin/reservations/{src}/{id}", Repo.AdminPostShowReservationDetail)
 
 	return mux
 }

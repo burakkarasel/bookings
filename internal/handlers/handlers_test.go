@@ -53,6 +53,60 @@ var theTests = []struct {
 		method:             "GET",
 		expectedStatusCode: http.StatusOK,
 	},
+	{
+		name:               "show-login",
+		url:                "/user/login",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "show-logout",
+		url:                "/user/logout",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "admin-dashboard",
+		url:                "/admin/dashboard",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "none existent page",
+		url:                "/don/don/don",
+		method:             "GET",
+		expectedStatusCode: http.StatusNotFound,
+	},
+	{
+		name:               "new reservations",
+		url:                "/admin/reservations-new",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "all reservations",
+		url:                "/admin/reservations-all",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "show reservations details",
+		url:                "/admin/reservations/new/3/show",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "show reservation calendar",
+		url:                "/admin/reservations-calendar",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "show reservation calendar with params",
+		url:                "/admin/reservations-calendar?y=2022&m=12",
+		method:             "GET",
+		expectedStatusCode: http.StatusOK,
+	},
 }
 
 // TestGetHandlers is our test func for handlers, it tests only our render handlers
@@ -112,8 +166,8 @@ func TestRepository_MakeReservation(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test with non-existent room, so I will get no availability
@@ -127,8 +181,8 @@ func TestRepository_MakeReservation(t *testing.T) {
 	session.Put(ctx, "reservation", reservation)
 
 	handler.ServeHTTP(rr, req)
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
@@ -194,8 +248,8 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// testing session not available
@@ -206,12 +260,12 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	rr = httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("PostmakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostmakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 	// failing form validation with invalid data
 
-	postedData.Set("first_name", "Jo")
+	postedData.Set("first_name", "John")
 	postedData.Set("last_name", "Smith")
 	postedData.Set("email", "john@here.com")
 	postedData.Set("phone", "555-555-5555")
@@ -242,8 +296,8 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	rr = httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// failing insert room restriction
@@ -258,8 +312,8 @@ func TestRepository_PostMakeReservation(t *testing.T) {
 	rr = httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostMakeReservation handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
@@ -369,13 +423,13 @@ func TestRepository_PostAvailability(t *testing.T) {
 			TestName:           "Invalid start date",
 			StartDate:          "start_date=invalid",
 			EndDate:            "end_date=2050-01-02",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			ExpectedStatusCode: http.StatusSeeOther,
 		},
 		{
 			TestName:           "Invalid end date",
 			StartDate:          "start_date=2050-01-01",
 			EndDate:            "end_date=invalid",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			ExpectedStatusCode: http.StatusSeeOther,
 		},
 		{
 			TestName:           "DB error",
@@ -415,8 +469,8 @@ func TestRepository_ReservationSummary(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("ReservationSummary handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("ReservationSummary handler returned wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// success after pulling reservation out from session
@@ -450,8 +504,8 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// invalid room id
@@ -467,8 +521,8 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// successful
@@ -510,21 +564,21 @@ func TestRepository_BookRoom(t *testing.T) {
 			RoomID:             "id=iii",
 			StartDate:          "s=2050-01-01",
 			EndDate:            "e=2050-01-02",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			ExpectedStatusCode: http.StatusSeeOther,
 		},
 		{
 			TestName:           "Invalid  start date",
 			RoomID:             "id=1",
 			StartDate:          "s=invalid",
 			EndDate:            "e=2050-01-02",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			ExpectedStatusCode: http.StatusSeeOther,
 		},
 		{
 			TestName:           "Invalid  end date",
 			RoomID:             "id=1",
 			StartDate:          "s=2050-01-01",
 			EndDate:            "e=invalid",
-			ExpectedStatusCode: http.StatusTemporaryRedirect,
+			ExpectedStatusCode: http.StatusSeeOther,
 		},
 		{
 			TestName:           "DB error",
@@ -548,6 +602,153 @@ func TestRepository_BookRoom(t *testing.T) {
 
 		if rr.Code != test.ExpectedStatusCode {
 			t.Errorf("BookRoom handler returned wrong status code: got %d, wanted %d", rr.Code, test.ExpectedStatusCode)
+		}
+	}
+}
+
+// TestRepository_PostShowLogin tests PostShowLogin handler
+func TestRepository_PostShowLogin(t *testing.T) {
+	var loginTests = []struct {
+		name                string
+		email               string
+		expecetedStatusCode int
+		expectedHTML        string
+		expectedLocation    string
+	}{
+		{
+			name:                "valid credentials",
+			email:               "me@here.ca",
+			expecetedStatusCode: http.StatusSeeOther,
+			expectedLocation:    "/",
+		},
+		{
+			name:                "invalid credentials",
+			email:               "jack@nimble.com",
+			expecetedStatusCode: http.StatusSeeOther,
+			expectedLocation:    "/user/login",
+		},
+		{
+			name:                "invalid data",
+			email:               "c",
+			expecetedStatusCode: http.StatusOK,
+			expectedHTML:        `action="/user/login"`,
+		},
+	}
+
+	for _, tt := range loginTests {
+		postedData := url.Values{}
+		postedData.Add("email", tt.email)
+		postedData.Add("password", "password")
+
+		req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(postedData.Encode()))
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.PostShowLogin)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expecetedStatusCode {
+			t.Errorf("%s failed : got %d, wanted %d", tt.name, rr.Code, tt.expecetedStatusCode)
+		}
+
+		if tt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if tt.expectedLocation != actualLocation.String() {
+				t.Errorf("%s failed: redirected to %s instead of %s", tt.name, actualLocation.String(), tt.expectedLocation)
+			}
+		}
+
+		if tt.expectedHTML != "" {
+			html := rr.Body.String()
+			if !strings.Contains(html, tt.expectedHTML) {
+				t.Errorf("%s failed: got body %s, expected %s", tt.name, html, tt.expectedHTML)
+			}
+		}
+	}
+}
+
+func TestRepository_AdminPostReservationsCalendar(t *testing.T) {
+	var tests = []struct {
+		name                 string
+		postedData           url.Values
+		expectedResponseCode int
+		expectedLocation     string
+		expectedHTML         string
+		blocks               int
+		reservations         int
+	}{
+		{
+			name: "cal",
+			postedData: url.Values{
+				"year":  {time.Now().Format("2006")},
+				"month": {time.Now().Format("01")},
+				fmt.Sprintf("add_block_1_%s", time.Now().AddDate(0, 0, 2).Format("2006-01-2")): {"1"},
+			},
+			expectedResponseCode: http.StatusSeeOther,
+		},
+		{
+			name:                 "cal-blocks",
+			postedData:           url.Values{},
+			expectedResponseCode: http.StatusSeeOther,
+			blocks:               1,
+		},
+		{
+			name:                 "cal-res",
+			postedData:           url.Values{},
+			expectedResponseCode: http.StatusSeeOther,
+			reservations:         1,
+		},
+	}
+
+	for _, tt := range tests {
+		var req *http.Request
+		if tt.postedData != nil {
+			req, _ = http.NewRequest("POST", "/admin/reservations-calendar", strings.NewReader(tt.postedData.Encode()))
+		} else {
+			req, _ = http.NewRequest("POST", "/admin/reservations-calendar", nil)
+		}
+
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+
+		now := time.Now()
+		bm := make(map[string]int)
+		rm := make(map[string]int)
+
+		currentYear, currentMonth, _ := now.Date()
+		currentLocation := now.Location()
+
+		firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+		for d := firstOfMonth; d.Before(lastOfMonth); d = d.AddDate(0, 0, 1) {
+			rm[d.Format("2006-01-2")] = 0
+			bm[d.Format("2006-01-2")] = 0
+		}
+
+		if tt.blocks > 0 {
+			bm[firstOfMonth.Format("2006-01-2")] = tt.blocks
+		}
+
+		if tt.reservations > 0 {
+			rm[lastOfMonth.Format("2006-01-2")] = tt.reservations
+		}
+
+		session.Put(ctx, "block_map_1", bm)
+		session.Put(ctx, "reservation_map_1", rm)
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminPostReservationsCalendar)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expectedResponseCode {
+			t.Errorf("failed %s: got code %d, wanted %d", tt.name, rr.Code, tt.expectedResponseCode)
 		}
 	}
 }
