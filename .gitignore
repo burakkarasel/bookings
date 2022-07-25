@@ -7,3 +7,4 @@ bookings
 *.code-workspace
 run.sh
 dsn.go
+test.txt
