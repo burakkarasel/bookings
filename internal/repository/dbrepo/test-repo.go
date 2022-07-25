@@ -70,6 +70,9 @@ func (repo *testDBRepo) UpdateUser(u models.User) error {
 
 // Authenticate authenticates a user
 func (repo *testDBRepo) Authenticate(email, testPassword string) (int, string, error) {
+	if email == "jack@nimble.com" {
+		return 0, "", errors.New("some error")
+	}
 	return 0, "", nil
 }
 
