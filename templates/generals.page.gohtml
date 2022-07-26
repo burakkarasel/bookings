@@ -1,5 +1,16 @@
 {{ template "base" .}} <!-- no end tag it is not necessary with layouts -->
 
+{{define "css"}}
+    <style>
+        body{
+            height: 100vh;
+        }
+        .my-footer {
+            bottom: 0;
+        }
+    </style>
+{{end}}
+
 {{define "content"}}
     <div class="container">
         <div class="row">

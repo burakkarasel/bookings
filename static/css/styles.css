@@ -5,6 +5,8 @@
   padding: 1em;
   color: #fafafa;
   font-size: 80%;
+  position: absolute;
+  width: 100%;
 }
 .room-img {
   max-width: 50%;
@@ -23,4 +25,5 @@
 
 body {
   overflow-x: hidden;
+  position: relative;
 }
