@@ -490,6 +490,7 @@ func TestRepository_ReservationSummary(t *testing.T) {
 	}
 }
 
+// TestRepository_ChooseRoom tests ChooseRoom handler
 func TestRepository_ChooseRoom(t *testing.T) {
 	// without session
 	req, _ := http.NewRequest("GET", "/choose-room/1", nil)
@@ -671,6 +672,7 @@ func TestRepository_PostShowLogin(t *testing.T) {
 	}
 }
 
+// TestRepository_AdminPostReservationsCalendar tests AdminPostReservationsCalendar handler
 func TestRepository_AdminPostReservationsCalendar(t *testing.T) {
 	var tests = []struct {
 		name                 string
@@ -749,6 +751,191 @@ func TestRepository_AdminPostReservationsCalendar(t *testing.T) {
 
 		if rr.Code != tt.expectedResponseCode {
 			t.Errorf("failed %s: got code %d, wanted %d", tt.name, rr.Code, tt.expectedResponseCode)
+		}
+	}
+}
+
+// TestRepository_AdminPostShowReservationDetail tests AdminPostShowReservationDetail handler
+func TestRepository_AdminPostShowReservationDetail(t *testing.T) {
+	var tests = []struct {
+		name               string
+		url                string
+		postedData         url.Values
+		expectedLocation   string
+		expectedStatuscode int
+	}{
+		{
+			name: "valid calendar",
+			url:  "/admin/reservations/cal/3/show",
+			postedData: url.Values{
+				"first_name": {"John"},
+				"last_name":  {"Smith"},
+				"email":      {"john@smith.com"},
+				"phone":      {"555-555-5555"},
+				"year":       {"2022"},
+				"month":      {"07"},
+			},
+			expectedLocation:   "/admin/reservations-calendar?y=2022&m=07",
+			expectedStatuscode: http.StatusSeeOther,
+		},
+		{
+			name: "valid all",
+			url:  "/admin/reservations/all/3/show",
+			postedData: url.Values{
+				"first_name": {"John"},
+				"last_name":  {"Smith"},
+				"email":      {"john@smith.com"},
+				"phone":      {"555-555-5555"},
+			},
+			expectedLocation:   "/admin/reservations-all",
+			expectedStatuscode: http.StatusSeeOther,
+		},
+		{
+			name: "valid new",
+			url:  "/admin/reservations/new/4/show",
+			postedData: url.Values{
+				"first_name": {"John"},
+				"last_name":  {"Smith"},
+				"email":      {"john@smith.com"},
+				"phone":      {"555-555-5555"},
+			},
+			expectedLocation:   "/admin/reservations-new",
+			expectedStatuscode: http.StatusSeeOther,
+		},
+	}
+
+	for _, tt := range tests {
+		var req *http.Request
+		if tt.postedData != nil {
+			req, _ = http.NewRequest("POST", tt.url, strings.NewReader(tt.postedData.Encode()))
+		} else {
+			req, _ = http.NewRequest("POST", tt.url, nil)
+		}
+
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+		req.RequestURI = tt.url
+		req.Form = tt.postedData
+
+		req.Header.Set("Content-Type", "x-www-form-urlencoded")
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(Repo.AdminPostShowReservationDetail)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expectedStatuscode {
+			t.Errorf("for %s: got status code %d, wanted %d", tt.name, rr.Code, tt.expectedStatuscode)
+		}
+
+		if tt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if tt.expectedLocation != actualLocation.String() {
+				t.Errorf("for %s: got location %s, wanted %s", tt.name, actualLocation.String(), tt.expectedLocation)
+			}
+		}
+	}
+}
+
+// TestRepository_AdminProcessedReservation tests AdminProcessedReservation handler
+func TestRepository_AdminProcessedReservation(t *testing.T) {
+	var tests = []struct {
+		name               string
+		url                string
+		expectedStatusCode int
+		expectedLocation   string
+	}{
+		{
+			name:               "valid cal",
+			url:                "/admin/process-reservations/cal/1/do?y=2022&m=07",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-calendar?y=2022&m=07",
+		},
+		{
+			name:               "valid all",
+			url:                "/admin/process-reservations/all/1/do",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-all",
+		},
+		{
+			name:               "valid new",
+			url:                "/admin/process-reservations/new/1/do",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-new",
+		},
+	}
+
+	for _, tt := range tests {
+		req, _ := http.NewRequest("GET", tt.url, nil)
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+		req.RequestURI = tt.url
+
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminProcessedReservation)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expectedStatusCode {
+			t.Errorf("for %s: got %d, wanted %d", tt.name, rr.Code, tt.expectedStatusCode)
+		}
+
+		if tt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != tt.expectedLocation {
+				t.Errorf("for %s: got location %s, wanted %s", tt.name, actualLocation.String(), tt.expectedLocation)
+			}
+		}
+	}
+}
+
+// TestRepository_AdminDeleteReservation tests AdminDeleteReservation handler
+func TestRepository_AdminDeleteResevation(t *testing.T) {
+	var tests = []struct {
+		name               string
+		url                string
+		expectedStatusCode int
+		expectedLocation   string
+	}{
+		{
+			name:               "del cal",
+			url:                "/admin/delete-reservations/cal/1/do?y=2022&m=07",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-calendar?y=2022&m=07",
+		},
+		{
+			name:               "del all",
+			url:                "/admin/delete-reservations/all/1/do",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-all",
+		},
+		{
+			name:               "del new",
+			url:                "/admin/delete-reservations/new/1/do",
+			expectedStatusCode: http.StatusSeeOther,
+			expectedLocation:   "/admin/reservations-new",
+		},
+	}
+
+	for _, tt := range tests {
+		req, _ := http.NewRequest("GET", tt.url, nil)
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+		req.RequestURI = tt.url
+
+		rr := httptest.NewRecorder()
+
+		handler := http.HandlerFunc(Repo.AdminDeleteReservation)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expectedStatusCode {
+			t.Errorf("for %s : got status code %d, wanted %d", tt.name, rr.Code, tt.expectedStatusCode)
+		}
+
+		if tt.expectedLocation != "" {
+			actualLocation, _ := rr.Result().Location()
+			if actualLocation.String() != tt.expectedLocation {
+				t.Errorf("for %s: got location %s, wanted %s", tt.name, actualLocation.String(), tt.expectedLocation)
+			}
 		}
 	}
 }

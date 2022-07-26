@@ -682,16 +682,16 @@ func (repo *Repository) AdminPostShowReservationDetail(w http.ResponseWriter, r 
 		return
 	}
 
-	/* exploded := strings.Split(r.RequestURI, "/") */
+	exploded := strings.Split(r.RequestURI, "/")
 
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	id, err := strconv.Atoi(exploded[4])
 
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
-	src := chi.URLParam(r, "src")
+	src := exploded[3]
 
 	stringMap := make(map[string]string)
 	stringMap["src"] = src
@@ -718,7 +718,7 @@ func (repo *Repository) AdminPostShowReservationDetail(w http.ResponseWriter, r 
 	month := r.Form.Get("month")
 	year := r.Form.Get("year")
 
-	if year == "" {
+	if src != "cal" {
 		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
 	} else {
 		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
@@ -730,14 +730,15 @@ func (repo *Repository) AdminPostShowReservationDetail(w http.ResponseWriter, r 
 
 // AdminReservationsCalendar marks a reservation processed
 func (repo *Repository) AdminProcessedReservation(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[4])
 
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
-	src := chi.URLParam(r, "src")
+	src := exploded[3]
 
 	processedVal := 1
 
@@ -762,14 +763,15 @@ func (repo *Repository) AdminProcessedReservation(w http.ResponseWriter, r *http
 
 // AdminDeleteReservation deletes a reservation from DB
 func (repo *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[4])
 
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
-	src := chi.URLParam(r, "src")
+	src := exploded[3]
 
 	err = repo.DB.DeleteReservation(id)
 
