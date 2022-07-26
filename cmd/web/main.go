@@ -18,7 +18,7 @@ import (
 	"github.com/burakkarasel/bookings/internal/utils"
 )
 
-const port = ":3000"
+var port = os.Getenv("PORT")
 
 var app config.AppConfig
 
