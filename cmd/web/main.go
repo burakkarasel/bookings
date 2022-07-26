@@ -18,7 +18,7 @@ import (
 	"github.com/burakkarasel/bookings/internal/utils"
 )
 
-var port = os.Getenv("PORT")
+var port = ":8080"
 
 var app config.AppConfig
 
