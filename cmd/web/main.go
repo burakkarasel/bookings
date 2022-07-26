@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/burakkarasel/bookings/dsn"
 	"github.com/burakkarasel/bookings/internal/config"
 	"github.com/burakkarasel/bookings/internal/driver"
 	"github.com/burakkarasel/bookings/internal/handlers"
@@ -76,23 +76,23 @@ func run() (*driver.DB, error) {
 	gob.Register(map[string]int{})
 
 	// read flags
-	/* 	inProduction := flag.Bool("production", true, "Application is in production")
-	   	useCache := flag.Bool("cache", false, "Stop using template cache")
-	   	dbName := flag.String("dbname", "", "Database name")
-	   	dbUser := flag.String("dbuser", "", "Database username")
-	   	dbPw := flag.String("dbpw", "", "Database password")
-	   	dbHost := flag.String("dbhost", "localhost", "Database host")
-	   	dbPort := flag.String("dbport", "5432", "Database port")
-	   	dbSSL := flag.String("dbssl", "disable", "Database ssl settings (disable, prefer, require)")
+	inProduction := flag.Bool("production", true, "Application is in production")
+	useCache := flag.Bool("cache", false, "Stop using template cache")
+	dbName := flag.String("dbname", "", "Database name")
+	dbUser := flag.String("dbuser", "", "Database username")
+	dbPw := flag.String("dbpw", "", "Database password")
+	dbHost := flag.String("dbhost", "localhost", "Database host")
+	dbPort := flag.String("dbport", "5432", "Database port")
+	dbSSL := flag.String("dbssl", "disable", "Database ssl settings (disable, prefer, require)")
 
-	   	flag.Parse()
+	flag.Parse()
 
-	   	if *dbName == "" || *dbUser == "" {
-	   		fmt.Println("missing required flags")
-	   		os.Exit(1)
-	   	} */
+	if *dbName == "" || *dbUser == "" {
+		fmt.Println("missing required flags")
+		os.Exit(1)
+	}
 
-	app.InProduction = false
+	app.InProduction = *inProduction
 
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
@@ -102,14 +102,14 @@ func run() (*driver.DB, error) {
 	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
 	// we set secure to false because we are not using https right now our sessions are not going to be encrypted
-	session.Cookie.Secure = false
+	session.Cookie.Secure = *inProduction
 
 	app.Session = session
 
 	// connect to DB
 	log.Println("Connecting to DB...")
-	/* connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPw, *dbSSL) */
-	db, err := driver.ConnectSQL(dsn.DSN)
+	connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPw, *dbSSL)
+	db, err := driver.ConnectSQL(connectionString)
 
 	if err != nil {
 		log.Fatal("Cannot connect to DB:", err)
@@ -125,7 +125,7 @@ func run() (*driver.DB, error) {
 	app.TemplateCache = tc
 	// it gives us to access to developer mode, so we can make changes on templates
 	// but as soon as we are done we should assign UseCache to true otherwise it will start reading from disc again
-	app.UseCache = true
+	app.UseCache = *useCache
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
