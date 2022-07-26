@@ -1,0 +1,2 @@
+insert into "users"("first_name", "last_name", "email", "password", "access_level", "created_at", "updated_at")
+values('admin', 'admin', 'admin@admin.com', '$2a$12$c9V7MkamIdeAs0SqZcrtS.mmsWf5fraA/Zvz4XtIPRySVRk3pk.s2', 3, '2022-07-19 20:35:03.000000', '2022-07-19 20:35:07.000000')
