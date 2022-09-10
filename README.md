@@ -83,15 +83,6 @@ go test -v -cover ./...
 go build -o bookings cmd/web/*.go && ./bookings -dbname=<your db name> -dbuser=<your user name> -dbpw=<your password> -cache=true -production=false
 ```
 
-## Deployed version
-
-- Deployed Version of the site visit - [here](https://139-144-66-136.ip.linodeusercontent.com/)
-
-To try the admin dashboard login with these credentials:
-
-- Email: admin@admin.com
-- Password: password
-
 ## Author Info
 
 - Twitter - [@dev_bck](https://twitter.com/dev_bck)
